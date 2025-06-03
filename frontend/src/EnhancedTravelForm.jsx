@@ -70,8 +70,31 @@ const EnhancedTravelForm = ({ onSuccess, onCancel }) => {
     );
   };
 
-  const handleImageChange = (e) => {
-    setTravelImages(Array.from(e.target.files));
+  const handleImageChange = async (e) => {
+    const files = Array.from(e.target.files);
+    const uploadedUrls = [];
+
+    for (let file of files) {
+      const data = new FormData();
+      data.append("file", file);
+      data.append("upload_preset", "tm8anqep");
+
+      try {
+        const res = await axios.post(
+          "https://api.cloudinary.com/v1_1/dpbwovnrm/image/upload",
+          data
+        );
+        uploadedUrls.push({
+          name: file.name,
+          size: file.size,
+          url: res.data.secure_url,
+        });
+      } catch (err) {
+        console.error("Image upload failed:", err);
+      }
+    }
+
+    setTravelImages(uploadedUrls);
   };
 
   // Function to add a new day
@@ -143,7 +166,7 @@ const EnhancedTravelForm = ({ onSuccess, onCancel }) => {
     formData.append("dailyBriefItinerary", combinedDailyItinerary);
 
     travelImages.forEach((image) => {
-      formData.append("travelImages", image);
+      formData.append("uploadedImages[]", image.url);
     });
 
     try {
