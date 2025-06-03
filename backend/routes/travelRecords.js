@@ -3,36 +3,11 @@ const express = require("express");
 const router = express.Router();
 const TravelRecord = require("../models/TravelRecord");
 const axios = require("axios");
-const multer = require("multer");
-const path = require("path");
+// const multer = require("multer"); // <<--- 移除 multer，因为文件已由前端上传到 Cloudinary
+// const path = require("path");   // <<--- path 可能也不再需要，除非其他地方用到
 
 // --- Multer Configuration ---
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/"); // Make sure 'uploads' folder exists
-  },
-  filename: function (req, file, cb) {
-    cb(
-      null,
-      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-    );
-  },
-});
-
-const fileFilter = (req, file, cb) => {
-  // Accept images only
-  if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
-    req.fileValidationError = "Only image files are allowed!";
-    return cb(new Error("Only image files are allowed!"), false);
-  }
-  cb(null, true);
-};
-
-const upload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
-  limits: { fileSize: 1024 * 1024 * 5 },
-}); // 5MB limit
+// REMOVE ALL MULTER CONFIGURATION (storage, fileFilter, upload variable)
 // --- End Multer Configuration ---
 
 async function geocodeDestination(destinationName) {
@@ -44,7 +19,6 @@ async function geocodeDestination(destinationName) {
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
     destinationName
   )}&key=${apiKey}`;
-
   try {
     const response = await axios.get(url);
     if (response.data.status === "OK" && response.data.results.length > 0) {
@@ -52,12 +26,9 @@ async function geocodeDestination(destinationName) {
       return { latitude: location.lat, longitude: location.lng };
     } else {
       console.error(
-        "Geocoding error for:",
-        destinationName,
-        "Status:",
-        response.data.status,
-        "Error:",
-        response.data.error_message
+        "Geocoding error for:", destinationName,
+        "Status:", response.data.status,
+        "Error:", response.data.error_message
       );
       return null;
     }
@@ -69,7 +40,7 @@ async function geocodeDestination(destinationName) {
 
 router.get("/", async (req, res) => {
   try {
-    const records = await TravelRecord.find().sort({ createdAt: -1 }); // Sort by creation usually better
+    const records = await TravelRecord.find().sort({ createdAt: -1 });
     res.json(records);
   } catch (err) {
     console.error(err.message);
@@ -77,13 +48,10 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Use upload.array('imagesFieldName', maxCount) for multiple files.
-// 'imagesFieldName' must match the name attribute of your file input in the form.
-router.post("/", upload.array("travelImages", 10), async (req, res) => {
-  // 'travelImages' is the field name for files
-  if (req.fileValidationError) {
-    return res.status(400).json({ msg: req.fileValidationError });
-  }
+// MODIFIED: Remove multer middleware from the route definition
+router.post("/", async (req, res) => {
+  // No req.fileValidationError check needed as multer is removed
+
   const {
     name,
     startDate,
@@ -92,16 +60,32 @@ router.post("/", upload.array("travelImages", 10), async (req, res) => {
     accommodation,
     rating,
     highlights,
-    purpose, // You might set this based on highlights or another field
-    // New fields
+    // purpose, // Assuming this is removed or handled by highlights
     companionType,
     budgetStyle,
     memorableFood,
     deepestImpressionSpot,
     travelTips,
-    keywordTags, // Expecting comma-separated string or array
+    keywordTags,
     dailyBriefItinerary,
+    // uploadedImages will now come from req.body, not req.files
   } = req.body;
+
+  // Get Cloudinary URLs from req.body
+  // Frontend sends `formData.append("uploadedImages[]", image.url);`
+  // So, req.body.uploadedImages should be an array of strings (Cloudinary URLs)
+  // If it's a single URL, it will be a string. Ensure it's always an array.
+  let uploadedImageUrls = [];
+  if (req.body.uploadedImages) {
+    if (Array.isArray(req.body.uploadedImages)) {
+      uploadedImageUrls = req.body.uploadedImages;
+    } else if (typeof req.body.uploadedImages === 'string') {
+      // If only one image URL is sent, it might not be an array
+      uploadedImageUrls = [req.body.uploadedImages];
+    }
+  }
+  // console.log("Received Cloudinary URLs in req.body.uploadedImages:", uploadedImageUrls);
+
 
   if (!name || !startDate || !destinationName) {
     return res.status(400).json({
@@ -112,37 +96,29 @@ router.post("/", upload.array("travelImages", 10), async (req, res) => {
   try {
     const coordinates = await geocodeDestination(destinationName);
     if (!coordinates) {
-      return res
-        .status(400)
-        .json({
+      return res.status(400).json({
           msg: `Could not geocode destination: ${destinationName}. Check API key and destination name.`,
         });
     }
 
-    const uploadedImagePaths = req.files
-      ? req.files.map((file) => `/uploads/${file.filename}`)
-      : [];
+    // const uploadedImagePaths = req.files ? req.files.map((file) => `/uploads/${file.filename}`) : []; // <<--- REMOVE THIS LINE
 
     let parsedKeywordTags = [];
-    if (typeof keywordTags === "string" && keywordTags.trim() !== "") {
-      parsedKeywordTags = keywordTags
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter((tag) => tag);
-    } else if (Array.isArray(keywordTags)) {
-      parsedKeywordTags = keywordTags
-        .map((tag) => String(tag).trim())
-        .filter((tag) => tag);
+    if (Array.isArray(keywordTags)) { // Frontend sends keywordTags[]
+        parsedKeywordTags = keywordTags.map(tag => String(tag).trim()).filter(tag => tag);
+    } else if (typeof keywordTags === 'string' && keywordTags.trim() !== '') { // Fallback if only one tag is sent as string
+        parsedKeywordTags = keywordTags.split(',').map(tag => tag.trim()).filter(tag => tag);
     }
+
 
     const duration =
       startDate && endDate
         ? Math.ceil(
             (new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)
           ) + 1
-        : undefined; // Or 1 if startDate implies at least one day
+        : undefined;
 
-    const newRecord = new TravelRecord({
+    const recordDataToSave = { // Use an intermediate object for clarity
       name,
       startDate,
       endDate,
@@ -150,11 +126,10 @@ router.post("/", upload.array("travelImages", 10), async (req, res) => {
       accommodation,
       rating: rating ? parseInt(rating) : undefined,
       highlights,
-      purpose: purpose || highlights, // Example: use highlights if purpose is empty
-      duration,
+      // purpose: purpose || highlights, // Assuming purpose is handled by highlights or removed
+      duration, // Ensure duration is calculated and sent from frontend if needed by schema
       latitude: coordinates.latitude,
       longitude: coordinates.longitude,
-      // New fields
       companionType,
       budgetStyle,
       memorableFood,
@@ -162,13 +137,15 @@ router.post("/", upload.array("travelImages", 10), async (req, res) => {
       travelTips,
       keywordTags: parsedKeywordTags,
       dailyBriefItinerary,
-      uploadedImages: uploadedImagePaths,
-    });
+      uploadedImages: uploadedImageUrls, // <<--- Use the Cloudinary URLs received from req.body
+    };
+    // console.log("Data to save to DB:", recordDataToSave);
 
+    const newRecord = new TravelRecord(recordDataToSave);
     const record = await newRecord.save();
     res.status(201).json(record);
   } catch (err) {
-    console.error("Error in POST /travel-records:", err.message);
+    console.error("Error in POST /travel-records:", err.message, err.stack);
     if (err.name === "ValidationError") {
       return res.status(400).json({ msg: err.message, details: err.errors });
     }
