@@ -17,7 +17,8 @@
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "mongoose": "^8.14.1",
-    "multer": "^2.0.0"
+    "multer": "^2.0.0",
+    "multer-storage-cloudinary": "^4.0.0"
   },
   "description": "",
   "devDependencies": {
