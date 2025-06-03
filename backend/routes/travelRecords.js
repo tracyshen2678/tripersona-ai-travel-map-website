@@ -1,24 +1,23 @@
 // routes/travelRecords.js
 const express = require("express");
 const router = express.Router();
-const TravelRecord = require("../models/TravelRecord");
-const axios = require("axios");
-// const multer = require("multer"); // <<--- 移除 multer，因为文件已由前端上传到 Cloudinary
-// const path = require("path");   // <<--- path 可能也不再需要，除非其他地方用到
+const TravelRecord = require("../models/TravelRecord"); // 确保路径正确
+const axios = require("axios"); // 用于 geocodeDestination
+const multer = require("multer"); // 引入 multer 来解析 multipart/form-data 的 req.body
 
-// --- Multer Configuration ---
-// REMOVE ALL MULTER CONFIGURATION (storage, fileFilter, upload variable)
-// --- End Multer Configuration ---
+// 配置 multer 实例，但不指定 storage，使用 .none() 来只解析文本字段
+const upload = multer();
 
 async function geocodeDestination(destinationName) {
   const apiKey = process.env.GOOGLE_GEOCODING_API_KEY;
   if (!apiKey) {
-    console.error("GOOGLE_GEOCODING_API_KEY is not set.");
+    console.error("❌ GOOGLE_GEOCODING_API_KEY is not set.");
     return null;
   }
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
     destinationName
   )}&key=${apiKey}`;
+
   try {
     const response = await axios.get(url);
     if (response.data.status === "OK" && response.data.results.length > 0) {
@@ -28,29 +27,33 @@ async function geocodeDestination(destinationName) {
       console.error(
         "Geocoding error for:", destinationName,
         "Status:", response.data.status,
-        "Error:", response.data.error_message
+        "Error:", response.data.error_message || "Unknown geocoding error"
       );
       return null;
     }
   } catch (error) {
-    console.error("Error calling Geocoding API:", error.message);
+    console.error("Error calling Geocoding API:", error.response ? error.response.data : error.message);
     return null;
   }
 }
 
+// GET all travel records
 router.get("/", async (req, res) => {
   try {
     const records = await TravelRecord.find().sort({ createdAt: -1 });
     res.json(records);
   } catch (err) {
-    console.error(err.message);
+    console.error("Error fetching travel records:", err.message);
     res.status(500).send("Server Error");
   }
 });
 
-// MODIFIED: Remove multer middleware from the route definition
-router.post("/", async (req, res) => {
-  // No req.fileValidationError check needed as multer is removed
+// POST a new travel record
+// Используем upload.none() для обработки текстовых полей из multipart/form-data, но не файлов
+router.post("/", upload.none(), async (req, res) => {
+  console.log("--- Backend POST /api/travel-records ---");
+  console.log("Received req.body (parsed by multer.none()):", JSON.stringify(req.body, null, 2));
+  // req.files будет undefined или пустым, так как upload.none() не обрабатывает файлы
 
   const {
     name,
@@ -60,32 +63,30 @@ router.post("/", async (req, res) => {
     accommodation,
     rating,
     highlights,
-    // purpose, // Assuming this is removed or handled by highlights
+    // purpose, // Предполагаем, что это поле удалено или обрабатывается через highlights
     companionType,
     budgetStyle,
     memorableFood,
     deepestImpressionSpot,
     travelTips,
-    keywordTags,
+    keywordTags, // Ожидаем, что это будет массив строк из req.body
     dailyBriefItinerary,
-    // uploadedImages will now come from req.body, not req.files
+    // uploadedImages будет из req.body.uploadedImages (массив URL-ов от Cloudinary)
   } = req.body;
 
-  // Get Cloudinary URLs from req.body
-  // Frontend sends `formData.append("uploadedImages[]", image.url);`
-  // So, req.body.uploadedImages should be an array of strings (Cloudinary URLs)
-  // If it's a single URL, it will be a string. Ensure it's always an array.
+  // Извлекаем URL-ы Cloudinary из req.body.uploadedImages
   let uploadedImageUrls = [];
-  if (req.body.uploadedImages) {
-    if (Array.isArray(req.body.uploadedImages)) {
-      uploadedImageUrls = req.body.uploadedImages;
-    } else if (typeof req.body.uploadedImages === 'string') {
-      // If only one image URL is sent, it might not be an array
-      uploadedImageUrls = [req.body.uploadedImages];
+  const imagesFromBody = req.body.uploadedImages; // Это должно быть именем поля, которое отправляет фронтенд
+
+  if (imagesFromBody) {
+    if (Array.isArray(imagesFromBody)) {
+      uploadedImageUrls = imagesFromBody.filter(url => typeof url === 'string' && url.trim() !== '');
+    } else if (typeof imagesFromBody === 'string' && imagesFromBody.trim() !== '') {
+      // Если отправлен только один URL, он может прийти как строка
+      uploadedImageUrls = [imagesFromBody];
     }
   }
-  // console.log("Received Cloudinary URLs in req.body.uploadedImages:", uploadedImageUrls);
-
+  console.log("Parsed Cloudinary URLs from req.body:", uploadedImageUrls);
 
   if (!name || !startDate || !destinationName) {
     return res.status(400).json({
@@ -101,33 +102,26 @@ router.post("/", async (req, res) => {
         });
     }
 
-    // const uploadedImagePaths = req.files ? req.files.map((file) => `/uploads/${file.filename}`) : []; // <<--- REMOVE THIS LINE
-
     let parsedKeywordTags = [];
-    if (Array.isArray(keywordTags)) { // Frontend sends keywordTags[]
+    if (Array.isArray(keywordTags)) {
         parsedKeywordTags = keywordTags.map(tag => String(tag).trim()).filter(tag => tag);
-    } else if (typeof keywordTags === 'string' && keywordTags.trim() !== '') { // Fallback if only one tag is sent as string
-        parsedKeywordTags = keywordTags.split(',').map(tag => tag.trim()).filter(tag => tag);
+    } else if (typeof keywordTags === 'string' && keywordTags.trim() !== '') {
+        // This case might not be necessary if frontend always sends keywordTags[]
+        parsedKeywordTags = [keywordTags.trim()];
     }
+    
+    // const duration = ...; // Если вы все еще вычисляете и отправляете duration с фронтенда
 
-
-    const duration =
-      startDate && endDate
-        ? Math.ceil(
-            (new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)
-          ) + 1
-        : undefined;
-
-    const recordDataToSave = { // Use an intermediate object for clarity
+    const recordDataToSave = {
       name,
       startDate,
-      endDate,
+      endDate: endDate || undefined, // Убедитесь, что endDate может быть необязательным
       destinationName,
       accommodation,
       rating: rating ? parseInt(rating) : undefined,
       highlights,
-      // purpose: purpose || highlights, // Assuming purpose is handled by highlights or removed
-      duration, // Ensure duration is calculated and sent from frontend if needed by schema
+      // purpose: purpose || highlights,
+      // duration, // Добавьте, если отправляете с фронтенда
       latitude: coordinates.latitude,
       longitude: coordinates.longitude,
       companionType,
@@ -137,17 +131,30 @@ router.post("/", async (req, res) => {
       travelTips,
       keywordTags: parsedKeywordTags,
       dailyBriefItinerary,
-      uploadedImages: uploadedImageUrls, // <<--- Use the Cloudinary URLs received from req.body
+      uploadedImages: uploadedImageUrls, // Используем URL-ы от Cloudinary
     };
-    // console.log("Data to save to DB:", recordDataToSave);
 
+    console.log("--- Data being prepared for DB save (Cloudinary URLs) ---");
+    console.log(JSON.stringify(recordDataToSave, null, 2));
+    
     const newRecord = new TravelRecord(recordDataToSave);
     const record = await newRecord.save();
+    
+    console.log("Record saved successfully with Cloudinary URLs:", record._id);
     res.status(201).json(record);
+
   } catch (err) {
     console.error("Error in POST /travel-records:", err.message, err.stack);
     if (err.name === "ValidationError") {
-      return res.status(400).json({ msg: err.message, details: err.errors });
+      // Log more details for validation errors
+      let validationErrors = {};
+      if (err.errors) {
+        for (let field in err.errors) {
+          validationErrors[field] = err.errors[field].message;
+        }
+      }
+      console.error("Validation Errors:", validationErrors);
+      return res.status(400).json({ msg: "Validation failed.", details: validationErrors });
     }
     res.status(500).send("Server Error: " + err.message);
   }
