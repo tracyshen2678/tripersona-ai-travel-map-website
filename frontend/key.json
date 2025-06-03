@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "psychic-era-459212-b8",
+  "private_key_id": "1e47cff1b691111f801a024fd94e99bdb232eeee",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDkW+4+UaYCOKQJ\ndIY4+JH/vpu4i7/pxWFRcmOCGL9rr2Q6+hKe8Gf/D4rqjMCq1xZf/LzatnZo0g+n\nl2YTgpz66cZs20qpok/8reT2N9irb+/iq9e4aALQsQg1FzJ47zJAo06HINUB/9bX\ngg9OukM2NEstPk3qoJq696cKhm/1cfE+tlrJMhGWQA8efQp2YBkMwe7s4OgEI1Ng\nwZqSMiBEU5PnPpueF4MJUjZ1vpCa6tW1Lom+D6XZEWVxPMQPO74fhx88wrSM3zsK\nBZL5wQ27ipJeW66AbCmIwO3HBDtkC1KQRDt5WxEsftj8KWlaFFBQAau/dxaClrMW\naUjAKW7fAgMBAAECggEAAcFtLEsku2lOZYjg9p4pQoM8yjyUzfTHrJXJtbh//Dwd\nyVBJMAdJcri0CN0/0UW/CnTfH3qooAysCc32/xkRdjexiqkIQr6YiSjtv4YquG1a\nCu7m79LTjAwts87JA2H/YRIq/+HyO/DeE3ZmAg/E2tf9vfbNKDZyNL7DqNKOGMpy\n6HQXvOogHL3kv37UEJuGhS1koVIeD4TXiJ27YGBwn/ogqnMo8a5Y8t8r7I1tLsrM\nqoLb8XRD7ooEB8TlB+mSBe+vVkbFobOJQlFQPQ8r1tm+jKsgpBGHBiNfv/7orswk\ncZz+WWY0Cws8zAzNHwtxVBaRr2GEOQZBdJ3yLuyN7QKBgQDy/e1ne7Yknk5LskS0\nG/WdfjJmlHnJb/lkHbKsETo2ozluLtKiIPKdtrLBN+s7IZSFdar9Sbe5mij32z8H\nuDFy/4Bxd8pyMFipFFRDE5LYf99fcgh39ALugMCRJGuvHttfWO+tBzwU2eAXmudP\nPs+4/k9zil1yBALswHdFuWw/uwKBgQDwlXf61frEz6G9+YTccM+zLQx0a6tvYf7j\nbW9OT5suxhDCbmlnPEwfjwa0+r86mknNKy1HXMet2STxH/rJ5x79NlyUNuYu+3ok\nSI+/qYIDFsnnxJpcIiG10t8jSRa4n+Nblh+l34GWUnpArvLAKmTV4o7aJhflbSSt\n7T28dz+BLQKBgQDDiIR+rnVeuCjnDtfsW0dlacSi+T2bVEjKQH+jqOVATE6NlI4Y\nuwygzwC/LQFUfuwmDQ8AbU6zwxLOiJYK3zSjhmjUZgH5q1/dByfbJigXoaadBoU8\nCZZGWEMdSMKClAERk96iTN0TJlQGircx9KhxA+vpXOFfO00jOKmB6PjruwKBgFn4\nu+btsRt7PtSqBNrfwX0Tgs3jGjjMYCMzYOXbdYB3h/r+iaKW9Sz0MyDpiSxkWOdG\nl2dRtkc4ps0aFZL+QSOW+eZf5ZN6boI1NLULslhvZFCtwMBl709tLg+nHL0s5jzx\nFqLUxESwUZHxG01sTUuDr8K7bkJZn9b/mw/pVLF9AoGAQc5IWPdVoL35SUL0oGwH\nTTEwRyRRc1FToouhORmwxTp67hvNCifJWVMxz7++IJ2ta+mrFJqn40FjQ9iPXdX7\nxZolysgAtGIVVx3/L6b1AtdwJE9hF11/bi887BBTKZztm3HXnUjzCI2ZsG1QX/WR\nDP3I6+8I8M5oPB2sZkJRyp4=\n-----END PRIVATE KEY-----\n",
+  "client_email": "docker-pusher@psychic-era-459212-b8.iam.gserviceaccount.com",
+  "client_id": "117464416108114537751",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/docker-pusher%40psychic-era-459212-b8.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

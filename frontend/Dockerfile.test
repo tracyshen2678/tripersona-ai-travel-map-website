@@ -1,0 +1,3 @@
+FROM alpine
+RUN echo "Minimal test image" > /test.txt
+CMD cat /test.txt

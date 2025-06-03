@@ -1,0 +1,330 @@
+/* EnhancedTravelForm.css */
+
+/* --- Global Form Container --- */
+.travel-form {
+  background-color: #ffffff;
+  padding: 25px 30px; /* Increased padding */
+  border-radius: 12px; /* Softer radius */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Softer shadow */
+  margin: 30px auto;
+  max-width: 750px; /* Slightly increased max-width */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif; /* Common system font stack */
+}
+
+.travel-form h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
+  font-size: 1.8rem; /* Slightly larger title */
+  font-weight: 600;
+}
+
+/* --- Fieldset Styling for Sections --- */
+.travel-form fieldset {
+  border: 1px solid #e0e0e0; /* Lighter border */
+  padding: 20px;
+  margin-bottom: 25px;
+  border-radius: 8px; /* Radius for fieldsets */
+}
+
+.travel-form legend {
+  padding: 0 10px;
+  font-weight: 600; /* Bolder legend */
+  font-size: 1.1rem; /* Larger legend text */
+  color: #1a202c; /* Darker legend color */
+}
+
+/* --- Individual Form Sections --- */
+.form-section {
+  margin-bottom: 20px; /* Spacing between fields */
+}
+
+.form-section label {
+  display: block;
+  margin-bottom: 8px; /* More space below label */
+  font-weight: 500;
+  font-size: 0.95rem; /* Slightly adjusted label size */
+  color: #4a5568; /* Softer label color */
+}
+
+/* --- Input, Select, Textarea General Styling --- */
+.form-section input[type="text"],
+.form-section input[type="date"],
+.form-section input[type="file"],
+.form-section select,
+.form-section textarea {
+  width: 100%;
+  padding: 12px 15px; /* Increased padding for better height and feel */
+  border: 1px solid #cbd5e0; /* Softer border color */
+  border-radius: 6px; /* Consistent radius */
+  box-sizing: border-box;
+  font-size: 1rem; /* Standard font size (around 16px) */
+  line-height: 1.5; /* Good line height for readability */
+  color: #2d3748; /* Input text color */
+  background-color: #fff;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.form-section input[type="text"]:focus,
+.form-section input[type="date"]:focus,
+.form-section input[type="file"]:focus,
+.form-section select:focus,
+.form-section textarea:focus {
+  outline: none;
+  border-color: #2563eb; /* Highlight color on focus */
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); /* Focus ring */
+}
+
+/* --- Placeholder Styling (Consistent across browsers) --- */
+.form-section input[type="text"]::placeholder,
+.form-section textarea::placeholder {
+  color: #a0aec0; /* Lighter placeholder color */
+  font-size: 0.95rem; /* Placeholder font size, slightly smaller or same as input */
+  opacity: 1; /* Ensure visibility */
+}
+.form-section input[type="text"]::-webkit-input-placeholder,
+.form-section textarea::-webkit-input-placeholder {
+  color: #a0aec0;
+  font-size: 0.95rem;
+}
+.form-section input[type="text"]::-moz-placeholder,
+.form-section textarea::-moz-placeholder {
+  color: #a0aec0;
+  font-size: 0.95rem;
+  opacity: 1;
+}
+.form-section input[type="text"]:-ms-input-placeholder,
+.form-section textarea:-ms-input-placeholder {
+  color: #a0aec0;
+  font-size: 0.95rem;
+}
+.form-section input[type="text"]::-ms-input-placeholder,
+.form-section textarea::-ms-input-placeholder {
+  color: #a0aec0;
+  font-size: 0.95rem;
+}
+
+/* --- Specific for Textarea (general ones, not daily entry ones specifically unless covered by this) --- */
+.form-section textarea {
+  min-height: 120px; /* Increased min-height for textareas */
+  resize: vertical;
+}
+
+/* --- Row layout for Start/End Date --- */
+.form-row {
+  display: flex;
+  gap: 20px; /* Space between items in a row */
+  align-items: flex-start; /* Align items to the start if they have different heights */
+}
+
+.form-row .form-section {
+  flex: 1; /* Allow sections in a row to share space */
+  margin-bottom: 0; /* Remove bottom margin if it's the last element or handled by gap */
+}
+
+/* --- Checkbox Group Styling --- */
+.checkbox-group {
+  display: grid; /* Using grid for better alignment */
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(160px, 1fr) /* Increased min-width for checkbox labels */
+  );
+  gap: 10px;
+  padding-top: 5px;
+}
+
+.checkbox-group label.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: normal;
+  font-size: 0.8rem;
+  padding: 8px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  background-color: #f7fafc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  justify-content: flex-start;
+}
+.checkbox-group label.checkbox-label:hover {
+  background-color: #edf2f7;
+  border-color: #cbd5e0;
+}
+.checkbox-group input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+  accent-color: #2563eb;
+}
+.checkbox-group input[type="checkbox"]:checked + span {
+  font-weight: 500;
+}
+
+/* --- Image Preview Styling --- */
+.image-preview-container {
+  margin-top: 15px;
+  padding: 15px;
+  border: 1px dashed #cbd5e0;
+  border-radius: 6px;
+  background-color: #f8f9fa;
+}
+.image-preview-container p {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-weight: 500;
+  color: #4a5568;
+}
+.image-preview-container ul {
+  list-style-type: none;
+  padding-left: 0;
+  margin-bottom: 0;
+}
+.image-preview-container li {
+  font-size: 0.9em;
+  color: #4a5568;
+  padding: 3px 0;
+  word-break: break-all;
+}
+
+/* --- Form Actions (Buttons) --- */
+.form-actions {
+  text-align: right;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0; /* Separator line */
+}
+
+.form-actions button {
+  padding: 12px 25px; /* Larger buttons */
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600; /* Bolder button text */
+  margin-left: 12px;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+}
+
+.form-actions button[type="submit"] {
+  background-color: #2563eb; /* Primary button color */
+  color: white;
+}
+.form-actions button[type="submit"]:hover {
+  background-color: #1d4ed8; /* Darker on hover */
+}
+.form-actions button[type="submit"]:active {
+  transform: translateY(1px); /* Click effect */
+}
+
+.form-actions button[type="button"] {
+  /* Cancel button */
+  background-color: #e2e8f0; /* Lighter secondary button */
+  color: #2d3748;
+}
+.form-actions button[type="button"]:hover {
+  background-color: #cbd5e0;
+}
+.form-actions button[type="button"]:active {
+  transform: translateY(1px);
+}
+
+.form-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* --- Error Message Styling --- */
+.form-error {
+  color: #e53e3e; /* Red for errors */
+  background-color: #fed7d7; /* Light red background */
+  border: 1px solid #f56565;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* --- Styles for Dynamic Daily Itinerary --- */
+.daily-entry {
+  margin-bottom: 15px;
+  padding: 15px; /* Increased padding */
+  border: 1px solid #e2e8f0; /* Consistent border */
+  border-radius: 8px; /* Consistent radius */
+  background-color: #f8f9fa;
+}
+
+.daily-entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px; /* More space */
+}
+
+.daily-entry-header strong {
+  font-size: 1.05rem; /* Slightly larger Day X label */
+  color: #2d3748;
+}
+
+/* Styling for the remove button (X) */
+.remove-day-btn {
+  background-color: transparent;
+  border: none;
+  color: #e53e3e;
+  font-size: 1.5rem; /* Larger X */
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0 8px; /* More clickable area */
+  line-height: 1;
+  border-radius: 50%; /* Make it round */
+  width: 28px; /* Fixed size */
+  height: 28px; /* Fixed size */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.remove-day-btn:hover {
+  color: #c53030;
+  background-color: #fed7d7; /* Light red background on hover */
+}
+
+/* Styling for the "Add Another Day" button */
+.add-day-btn {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 18px; /* Adjusted padding */
+  background-color: #4299e1; /* A different color to distinguish */
+  color: white;
+  border: none; /* Removed border for a flatter look */
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: background-color 0.2s;
+}
+.add-day-btn:hover {
+  background-color: #3182ce; /* Darker on hover */
+}
+
+/* Ensure textareas within daily entries also get general focus styles */
+.daily-entry textarea {
+  /* Inherits from .form-section textarea if not overridden */
+  /* You can add specific overrides here if needed, e.g., different min-height */
+  min-height: 60px; /* Smaller min-height for daily entries */
+}
+
+/* ---强制调试样式 (您可以根据需要保留或移除) --- */
+/* 针对 ID 为 name 和 destination 的输入框 */
+#name,
+#destination {
+  width: 49% !important;
+  min-width: 200px !important;
+  padding: 12px 15px !important;
+  font-size: 1rem !important;
+  height: auto !important;
+  box-sizing: border-box !important;
+}
