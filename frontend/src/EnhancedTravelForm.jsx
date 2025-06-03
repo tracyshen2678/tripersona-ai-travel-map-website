@@ -118,78 +118,17 @@ const EnhancedTravelForm = ({ onSuccess, onCancel }) => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
-  setIsSubmitting(true);
+    e.preventDefault();
+    setError("");
+    setIsSubmitting(true);
 
-  if (!name || !startDate || !destination) {
-    setError("Please fill in required fields: Name, Start Date, Destination.");
-    setIsSubmitting(false);
-    return;
-  }
-
-  // 合并 daily itinerary
-  const combinedDailyItinerary = dailyEntries
-    .map((entry, index) => `Day ${index + 1}: ${entry.description.trim()}`)
-    .filter((entry) => entry.trim() !== "Day X:") // 排除空白
-    .join("\n\n");
-
-  // ✅ 用 JSON 构建完整对象
-  const travelData = {
-    name,
-    startDate,
-    endDate,
-    destinationName: destination,
-    accommodation,
-    rating: rating ? parseInt(rating) : null,
-    highlights,
-    companionType,
-    budgetStyle,
-    memorableFood,
-    deepestImpressionSpot,
-    travelTips,
-    keywordTags: selectedKeywordTags,
-    dailyBriefItinerary: combinedDailyItinerary,
-    uploadedImages: travelImages.map((img) => img.url), // ✅ Cloudinary URL
-  };
-
-  try {
-    const response = await axios.post(
-      `${API_BASE_URL}/travel-records`,
-      travelData,
-      {
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-    onSuccess(response.data);
-    // ✅ Reset 所有字段
-    setName("");
-    setStartDate("");
-    setEndDate("");
-    setDestination("");
-    setAccommodation("");
-    setRating("");
-    setHighlights("");
-    setCompanionType("");
-    setBudgetStyle("");
-    setMemorableFood("");
-    setDeepestImpressionSpot("");
-    setTravelTips("");
-    setSelectedKeywordTags([]);
-    setDailyEntries([{ description: "" }]);
-    setTravelImages([]);
-  } catch (err) {
-    console.error("Form submission error:", err.response || err.message);
-    setError(
-      `Submission failed: ${
-        err.response?.data?.msg || err.message || "Unknown error"
-      }`
-    );
-  } finally {
-    setIsSubmitting(false);
-  }
-};
-
+    if (!name || !startDate || !destination) {
+      setError(
+        "Please fill in required fields: Name, Start Date, Destination."
+      );
+      setIsSubmitting(false);
+      return;
+    }
 
     const formData = new FormData();
     formData.append("name", name);
