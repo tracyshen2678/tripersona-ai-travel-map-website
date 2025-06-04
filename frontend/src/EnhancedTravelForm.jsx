@@ -70,31 +70,45 @@ const EnhancedTravelForm = ({ onSuccess, onCancel }) => {
     );
   };
 
+  const [isUploading, setIsUploading] = useState(false); // New state for Cloudinary upload status
+
   const handleImageChange = async (e) => {
     const files = Array.from(e.target.files);
-    const uploadedUrls = [];
+    if (files.length === 0) {
+      setTravelImages([]); // 如果用户取消了文件选择或没有选择文件，清空 travelImages
+      return;
+    }
+
+    setIsUploading(true); // 在开始上传循环之前，设置 isUploading 为 true
+    setError(""); // 清除之前的错误信息
+    const uploadedFileObjects = []; // 用来收集成功上传到 Cloudinary 的图片信息
 
     for (let file of files) {
+      // 循环处理用户选择的每个文件
       const data = new FormData();
       data.append("file", file);
-      data.append("upload_preset", "tm8anqep");
+      data.append("upload_preset", "tm8anqep"); // 您的 Cloudinary 上传预设
 
       try {
         const res = await axios.post(
-          "https://api.cloudinary.com/v1_1/dpbwovnrm/image/upload",
+          "https://api.cloudinary.com/v1_1/dpbwovnrm/image/upload", // 您的 Cloudinary 上传 URL
           data
         );
-        uploadedUrls.push({
+        // 将成功上传的图片信息（包括 Cloudinary 返回的 URL）添加到数组
+        uploadedFileObjects.push({
           name: file.name,
           size: file.size,
           url: res.data.secure_url,
         });
       } catch (err) {
-        console.error("Image upload failed:", err);
+        console.error("Cloudinary upload failed for file:", file.name, err);
+        setError(`Failed to upload ${file.name}. Please try again.`);
+        // 这里可以根据需求决定是否中断后续图片的上传，
+        // 或者允许用户在部分图片上传失败的情况下继续（但可能需要在 UI 上有更明确的提示）
       }
     }
-
-    setTravelImages(uploadedUrls);
+    setTravelImages(uploadedFileObjects); // 用成功上传的图片信息更新 travelImages state
+    setIsUploading(false); // 所有选中的文件都处理完毕后（无论成功或失败），设置 isUploading 为 false
   };
 
   // Function to add a new day
@@ -118,6 +132,12 @@ const EnhancedTravelForm = ({ onSuccess, onCancel }) => {
   };
 
   const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (isUploading) {
+      // 如果图片仍在上传到 Cloudinary，则阻止表单提交
+      setError("Images are still uploading. Please wait.");
+      return;
+    }
     e.preventDefault();
     setError("");
     setIsSubmitting(true);
