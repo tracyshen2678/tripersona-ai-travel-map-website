@@ -100,7 +100,6 @@ function App() {
   const getPlacePhoto = async (locationName) => {
     try {
       const enhancedKeywords = [
-        `${locationName} getty image`,
         `${locationName} famous place`,
         `${locationName} landmark`,
         `${locationName} skyline`,
