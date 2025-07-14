@@ -1,2 +1,7 @@
 frontend/key.json
 *.json
+
+# Virtual environments
+.venv
+
+.env
